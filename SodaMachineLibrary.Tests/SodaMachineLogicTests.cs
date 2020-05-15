@@ -150,6 +150,9 @@ namespace SodaMachineLibrary.Tests
             decimal expectedRefundAmount;
             decimal actualRefundAmount;
 
+            sodaMachineLogic.MoneyInserted(userId, 0.25M);
+            sodaMachineLogic.MoneyInserted(userId, 0.25M);
+
             expectedRefundAmount = sodaMachineLogic.GetMoneyInsertedTotal(userId);
             actualRefundAmount = sodaMachineLogic.IssueFullRefund(userId);
 

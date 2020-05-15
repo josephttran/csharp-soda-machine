@@ -3,6 +3,7 @@ using SodaMachineLibrary.CustomException;
 using SodaMachineLibrary.Models;
 using System.Collections.Generic;
 using SodaMachineLibrary.DataAccess;
+using System.Linq;
 
 namespace SodaMachineLibrary.Logics
 {
@@ -10,14 +11,14 @@ namespace SodaMachineLibrary.Logics
     {
         private readonly IDataAccess _dataAccess;
         private string _userId;
-        public List<decimal> AccaptedCoinValues { get; set; }
+        public List<decimal> AcceptedCoinValues { get; set; }
 
         public SodaMachineLogic(IDataAccess dataAccess)
         {
             _dataAccess = dataAccess;
             _userId = "user1234";
 
-            AccaptedCoinValues = new List<decimal>()
+            AcceptedCoinValues = new List<decimal>()
             {
                 0.25M,
                 1.00M
@@ -77,14 +78,40 @@ namespace SodaMachineLibrary.Logics
 
         public decimal IssueFullRefund(string userId)
         {
+            List<CoinModel> coins = new List<CoinModel>();
             decimal totalRefund = _dataAccess.UserCreditTotal(userId);
+
+            _dataAccess.UserCreditInsert(userId, -totalRefund);
 
             if (totalRefund != 0)
             {
+                int dollarQuantity = 0;
+                int quarterQuantity = 0;
+
+                while (totalRefund >= 1.00M)
+                {
+                    dollarQuantity++;
+                    totalRefund = decimal.Subtract(totalRefund, 1.00M);
+                }
+
+                while (totalRefund >= 0.25M)
+                {
+                    quarterQuantity++;
+                    totalRefund = decimal.Subtract(totalRefund, 0.25M);
+                }
+
+                coins.AddRange(_dataAccess.CoinInventoryWithdrawCoins(1.00M, dollarQuantity));
+                coins.AddRange(_dataAccess.CoinInventoryWithdrawCoins(0.25M, quarterQuantity));
+
                 _dataAccess.UserCreditClear(userId);
             }
 
-            return totalRefund;
+            if (coins.Count > 0)
+            {
+                return coins.Sum(coinModel => coinModel.Amount);
+            }
+
+            return 0;
         }
 
         public List<SodaModel> ListTypesOfSoda()
@@ -96,7 +123,7 @@ namespace SodaMachineLibrary.Logics
         {
             _userId = userId;
 
-            if (!AccaptedCoinValues.Contains(amount))
+            if (!AcceptedCoinValues.Contains(amount))
             {
                 Console.WriteLine("Invalid currency!");
                 _dataAccess.UserCreditInsert(userId, 0);
@@ -141,6 +168,8 @@ namespace SodaMachineLibrary.Logics
 
                 List<CoinModel> coins = new List<CoinModel>();
                 decimal change = userCredit - sodaPrice;
+
+                _dataAccess.UserCreditInsert(_userId, -change);
 
                 int dollarQuantity = 0;
                 int quarterQuantity = 0;
