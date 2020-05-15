@@ -12,6 +12,8 @@ using SodaMachineWebApplication.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SodaMachineLibrary.DataAccess;
+using SodaMachineLibrary.Logics;
 
 namespace SodaMachineWebApplication
 {
@@ -33,6 +35,9 @@ namespace SodaMachineWebApplication
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
+
+            services.AddSingleton<IDataAccess, TextFileDataAccess>();
+            services.AddTransient<ISodaMachineLogic, SodaMachineLogic>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
