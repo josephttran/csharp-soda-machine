@@ -26,16 +26,30 @@ namespace SodaMachineLibrary.DataAccess
         {
             List<CoinModel> coinInventory;
             List<string> output = new List<string>();
+            decimal amount = 0;
 
             coinInventory = CoinInventoryGetAll();
             coinInventory.AddRange(coins);
 
             foreach(var coinModel in coinInventory)
             {
+                amount += coinModel.Amount;
                 output.Add($"{ coinModel.Name },{ coinModel.Amount }");
             }
 
             File.WriteAllLines(_coinInventoryPath, output);
+
+            // Update income
+            string[] machineInfoEntry = File.ReadLines(_machineInfoPath).First().Split(',');
+            decimal cashOnHand = decimal.Parse(machineInfoEntry[0]);
+            decimal sodaPrice = decimal.Parse(machineInfoEntry[1]);
+            decimal totalIncome = decimal.Parse(machineInfoEntry[2]);
+
+            cashOnHand += amount;
+            totalIncome += amount;
+            string machineInfoUpdated = $"{cashOnHand},{ sodaPrice },{ totalIncome }";
+
+            File.WriteAllText(_machineInfoPath, machineInfoUpdated);
         }
 
         public List<CoinModel> CoinInventoryGetAll()
@@ -81,6 +95,18 @@ namespace SodaMachineLibrary.DataAccess
             }
 
             File.WriteAllLines(_coinInventoryPath, output);
+
+            // Update income
+            string[] machineInfoEntry = File.ReadLines(_machineInfoPath).First().Split(',');
+            decimal cashOnHand = decimal.Parse(machineInfoEntry[0]);
+            decimal sodaPrice = decimal.Parse(machineInfoEntry[1]);
+            decimal totalIncome = decimal.Parse(machineInfoEntry[2]);
+
+            cashOnHand -= coinValue;
+            totalIncome -= coinValue;
+            string machineInfoUpdated = $"{cashOnHand},{ sodaPrice },{ totalIncome }";
+
+            File.WriteAllText(_machineInfoPath, machineInfoUpdated);
 
             return coins;
         }
@@ -269,18 +295,6 @@ namespace SodaMachineLibrary.DataAccess
             }
 
             File.WriteAllLines(_userCreditPath, output);
-
-            // Update income
-            string[] machineInfoEntry = File.ReadLines(_machineInfoPath).First().Split(',');
-            decimal cashOnHand = decimal.Parse(machineInfoEntry[0]);
-            decimal sodaPrice = decimal.Parse(machineInfoEntry[1]);
-            decimal totalIncome = decimal.Parse(machineInfoEntry[2]);
-
-            cashOnHand += amount;
-            totalIncome += amount;
-            string machineInfoUpdated = $"{cashOnHand},{ sodaPrice },{ totalIncome }";
-
-            File.WriteAllText(_machineInfoPath, machineInfoUpdated);
         }
 
         public decimal UserCreditTotal(string userId)
