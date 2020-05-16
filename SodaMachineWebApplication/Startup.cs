@@ -32,8 +32,16 @@ namespace SodaMachineWebApplication
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddIdentity<IdentityUser, IdentityRole>(config =>
+            {
+                config.Password.RequireNonAlphanumeric = false;
+                config.SignIn.RequireConfirmedEmail = true;
+            })
+                .AddDefaultUI()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
             services.AddRazorPages();
 
             services.AddSingleton<IDataAccess, TextFileDataAccess>();
