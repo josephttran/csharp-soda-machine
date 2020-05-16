@@ -5,3 +5,21 @@
 }
 
 <h1>@ViewData["Title"]</h1>
+<hr />
+<div class="container">
+    <div class="row">
+        <div class="col-8">
+            <dl class="row">
+                <dt class="col-sm-3">Total Machine Income</dt>
+                <dd class="col-sm-9">@Model.TotalIncome</dd>
+                <dt class="col-sm-3">Current Income</dt>
+                <dd class="col-sm-9">@Model.CurrentIncome</dd>
+            </dl>
+        </div>
+        <div class="col-4">
+            <form asp-page-handler="EmptyMachine" method="post">
+                <button class="btn btn-block btn-primary">EMPTY COIN FROM MACHINE</button>
+            </form>
+        </div>
+    </div>
+</div>
