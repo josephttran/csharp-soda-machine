@@ -26,14 +26,12 @@ namespace SodaMachineLibrary.DataAccess
         {
             List<CoinModel> coinInventory;
             List<string> output = new List<string>();
-            decimal amount = 0;
 
             coinInventory = CoinInventoryGetAll();
             coinInventory.AddRange(coins);
 
-            foreach(var coinModel in coinInventory)
+            foreach (var coinModel in coinInventory)
             {
-                amount += coinModel.Amount;
                 output.Add($"{ coinModel.Name },{ coinModel.Amount }");
             }
 
@@ -44,6 +42,12 @@ namespace SodaMachineLibrary.DataAccess
             decimal cashOnHand = decimal.Parse(machineInfoEntry[0]);
             decimal sodaPrice = decimal.Parse(machineInfoEntry[1]);
             decimal totalIncome = decimal.Parse(machineInfoEntry[2]);
+            decimal amount = 0;
+
+            foreach (var coinModel in coins)
+            {
+                amount += coinModel.Amount;
+            }
 
             cashOnHand += amount;
             totalIncome += amount;
