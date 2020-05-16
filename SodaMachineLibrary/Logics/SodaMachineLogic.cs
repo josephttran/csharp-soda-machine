@@ -81,10 +81,10 @@ namespace SodaMachineLibrary.Logics
             List<CoinModel> coins = new List<CoinModel>();
             decimal totalRefund = _dataAccess.UserCreditTotal(userId);
 
-            _dataAccess.UserCreditInsert(userId, -totalRefund);
-
             if (totalRefund != 0)
             {
+                _dataAccess.UserCreditInsert(userId, -totalRefund);
+
                 int dollarQuantity = 0;
                 int quarterQuantity = 0;
 
